@@ -10,6 +10,7 @@ import { IconButton } from "./components/IconButton";
 import { CircleButton } from "./components/CircleButton";
 import { EmojiPicker } from "./components/EmojiPicker";
 import { EmojiList } from "./components/EmojiList";
+import { EmojiSticker } from "./components/EmojiSticker";
 
 type SelectedImage = Pick<ImagePicker.ImagePickerResult["assets"][0], "uri">;
 
@@ -58,6 +59,7 @@ export default function App() {
         <ImageViewer
           placeholderImageSource={selectedImage || PlaceHolderImage}
         />
+        {pickedEmoji && <EmojiSticker stickerSource={pickedEmoji} imageSize={40} />}
       </View>
       {showAppOptions ? (
         <View style={styles.optionsContainer}>
