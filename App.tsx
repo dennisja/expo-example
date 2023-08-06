@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
 import PlaceHolderImage from "./assets/images/background-image.png";
@@ -8,6 +8,8 @@ import { Button } from "./components/Button";
 import { useState } from "react";
 import { IconButton } from "./components/IconButton";
 import { CircleButton } from "./components/CircleButton";
+import { EmojiPicker } from "./components/EmojiPicker";
+import { EmojiList } from "./components/EmojiList";
 
 type SelectedImage = Pick<ImagePicker.ImagePickerResult["assets"][0], "uri">;
 
@@ -16,6 +18,9 @@ export default function App() {
     null
   );
   const [showAppOptions, setShowAppOptions] = useState<boolean>(false);
+  const [isEmojiPickerVisible, setIsEmojiPickerVisible] =
+    useState<boolean>(false);
+  const [pickedEmoji, setPickedEmoji] = useState<any | null>(null);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -34,12 +39,21 @@ export default function App() {
     setShowAppOptions(false);
   };
 
-  const onAddSticker = () => {};
+  const onAddSticker = () => {
+    setIsEmojiPickerVisible(true);
+  };
 
   const onSaveImage = () => {};
 
+  const onModalClose = () => {
+    setIsEmojiPickerVisible(false);
+  };
+
   return (
     <View style={styles.container}>
+      <EmojiPicker isVisible={isEmojiPickerVisible} onClose={onModalClose}>
+        <EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
+      </EmojiPicker>
       <View style={styles.imageContainer}>
         <ImageViewer
           placeholderImageSource={selectedImage || PlaceHolderImage}
