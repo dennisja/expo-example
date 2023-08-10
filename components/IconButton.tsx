@@ -11,7 +11,7 @@ type IconButtonProps = {
 const IconButton = ({ iconName, label, onPress }: IconButtonProps) => {
   return (
     <Pressable onPress={onPress} style={styles.iconButton}>
-      <MaterialIcons name={iconName} />
+      <MaterialIcons name={iconName} style={{ color: "#fff" }} />
       <Text style={styles.iconButtonLabel}>{label}</Text>
     </Pressable>
   );

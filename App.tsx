@@ -1,17 +1,19 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useRef, useState } from "react";
+import * as MediaLibrary from "expo-media-library";
+import { captureRef } from "react-native-view-shot";
 
 import PlaceHolderImage from "./assets/images/background-image.png";
 import { ImageViewer } from "./components/ImageViewer";
 import { Button } from "./components/Button";
-import { useState } from "react";
 import { IconButton } from "./components/IconButton";
 import { CircleButton } from "./components/CircleButton";
 import { EmojiPicker } from "./components/EmojiPicker";
 import { EmojiList } from "./components/EmojiList";
 import { EmojiSticker } from "./components/EmojiSticker";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 type SelectedImage = Pick<ImagePicker.ImagePickerResult["assets"][0], "uri">;
 
@@ -23,6 +25,13 @@ export default function App() {
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] =
     useState<boolean>(false);
   const [pickedEmoji, setPickedEmoji] = useState<any | null>(null);
+  const [mediaLibStatus, requestMediaLibraryPermission] =
+    MediaLibrary.usePermissions();
+  const screenshotRef = useRef();
+
+  if (mediaLibStatus === null) {
+    requestMediaLibraryPermission();
+  }
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -45,7 +54,20 @@ export default function App() {
     setIsEmojiPickerVisible(true);
   };
 
-  const onSaveImage = () => {};
+  const onSaveImage = async () => {
+    try {
+      const localURI = await captureRef(screenshotRef, {
+        height: 440,
+        quality: 1,
+      });
+      await MediaLibrary.saveToLibraryAsync(localURI);
+      if (localURI) {
+        alert("Saved");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const onModalClose = () => {
     setIsEmojiPickerVisible(false);
@@ -58,12 +80,15 @@ export default function App() {
           <EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
         </EmojiPicker>
         <View style={styles.imageContainer}>
-          <ImageViewer
-            placeholderImageSource={selectedImage || PlaceHolderImage}
-          />
-          {pickedEmoji && (
-            <EmojiSticker stickerSource={pickedEmoji} imageSize={40} />
-          )}
+          {/* collapsible is set to false to make sure that only image and emoji sticker are captured */}
+          <View ref={screenshotRef} collapsable={false}>
+            <ImageViewer
+              placeholderImageSource={selectedImage || PlaceHolderImage}
+            />
+            {pickedEmoji && (
+              <EmojiSticker stickerSource={pickedEmoji} imageSize={40} />
+            )}
+          </View>
         </View>
         {showAppOptions ? (
           <View style={styles.optionsContainer}>
