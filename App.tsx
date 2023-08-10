@@ -2,9 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useRef, useState } from "react";
-import * as MediaLibrary from "expo-media-library";
-import { captureRef } from "react-native-view-shot";
+import { useState } from "react";
 
 import PlaceHolderImage from "./assets/images/background-image.png";
 import { ImageViewer } from "./components/ImageViewer";
@@ -14,6 +12,7 @@ import { CircleButton } from "./components/CircleButton";
 import { EmojiPicker } from "./components/EmojiPicker";
 import { EmojiList } from "./components/EmojiList";
 import { EmojiSticker } from "./components/EmojiSticker";
+import { useTakeScreenshot } from "./hooks/useTakeScreenShot";
 
 type SelectedImage = Pick<ImagePicker.ImagePickerResult["assets"][0], "uri">;
 
@@ -25,13 +24,7 @@ export default function App() {
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] =
     useState<boolean>(false);
   const [pickedEmoji, setPickedEmoji] = useState<any | null>(null);
-  const [mediaLibStatus, requestMediaLibraryPermission] =
-    MediaLibrary.usePermissions();
-  const screenshotRef = useRef();
-
-  if (mediaLibStatus === null) {
-    requestMediaLibraryPermission();
-  }
+  const { screenshotRef, onSaveImage } = useTakeScreenshot();
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -52,21 +45,6 @@ export default function App() {
 
   const onAddSticker = () => {
     setIsEmojiPickerVisible(true);
-  };
-
-  const onSaveImage = async () => {
-    try {
-      const localURI = await captureRef(screenshotRef, {
-        height: 440,
-        quality: 1,
-      });
-      await MediaLibrary.saveToLibraryAsync(localURI);
-      if (localURI) {
-        alert("Saved");
-      }
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const onModalClose = () => {
