@@ -52,7 +52,7 @@ export default function App() {
   };
 
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={styles.container}>
       <View style={styles.container}>
         <EmojiPicker isVisible={isEmojiPickerVisible} onClose={onModalClose}>
           <EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
